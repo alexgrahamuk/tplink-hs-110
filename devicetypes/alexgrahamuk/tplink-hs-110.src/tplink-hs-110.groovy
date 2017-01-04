@@ -18,7 +18,6 @@ metadata {
     definition(name: "tplink-hs-110", namespace: "alexgrahamuk", author: "Alex Graham") {
         capability "Switch"
         capability "Refresh"
-        capability "Polling"
         capability "Power Meter"
     }
 
@@ -26,28 +25,30 @@ metadata {
         // TODO: define status and reply messages here
     }
 
-    tiles {
+    tiles(scale: 2) {
 
-        multiAttributeTile(name:"switch", type: "device.switch", width: 6, height: 4, canChangeIcon: true){
+        multiAttributeTile(name:"switch", type: "lighting", width: 6, height: 4, canChangeIcon: true){
             tileAttribute ("device.switch", key: "PRIMARY_CONTROL") {
-                attributeState "on", label: 'On', action: "switch.off", icon: "st.switches.switch.on", backgroundColor: "#79b821"
-                attributeState "off", label: 'Off', action: "switch.on", icon: "st.switches.switch.off", backgroundColor: "#ffffff"
+                attributeState "on", label: 'On', action: "switch.off", icon: "st.switches.switch.on", backgroundColor: "#79b821", nextState: "turningOff"
+                attributeState "off", label: 'Off', action: "switch.on", icon: "st.switches.switch.off", backgroundColor: "#ffffff", nextState: "turningOn"
+                attributeState "turningOn", label: 'Turning On', action: "switch.off", icon: "st.switches.switch.on", backgroundColor: "#79b821", nextState: "turningOff"
+                attributeState "turningOff", label: 'Turning Off', action: "switch.on", icon: "st.switches.switch.off", backgroundColor: "#ffffff", nextState: "turningOn"
           }
             tileAttribute ("power", key: "SECONDARY_CONTROL") {
                 attributeState "power", label:'${currentValue} W'
             }
         }
 
-        standardTile("refresh", "device.power", width: 2, height: 2, decoration: "flat") {
-            state("default", label: "", action: "refresh.refresh", icon: "st.secondary.refresh")
+        standardTile("refresh", "device.power", inactiveLabel: false, decoration: "flat", width: 2, height: 2) {
+            state "default", label:'', action:"refresh.refresh", icon:"st.secondary.refresh"
         }
 
-        main("switch")
+        main "switch"
         details(["switch","refresh"])
     }
 
-    command "on"
-    command "off"
+    //command "on"
+    //command "off"
 
 }
 
@@ -122,16 +123,16 @@ def hubPowerResponse(response) {
     message("Executing 'hubPowerResponse': '${device.deviceNetworkId}'")
     //message(response)
 
-    def status = response.headers["x-hs100-status"] ?: ""
+    def status = response.headers["x-hs100-status"] ?: "0"
     message("switch power consumption: '${status}'")
     if (status != "") {
         sendEvent(name: "power", value: status, isStateChange: true)
     }
 }
 
-def poll() {
-    executeCommand("status")
-    executeCommand("consumption")
+def configure() {
+
+    sendEvent(name: "checkInterval", value: 1 * 60, displayed: false, data: [hubHardwareId: device.hub.hardwareID])
 }
 
 private executeCommand(command) {
