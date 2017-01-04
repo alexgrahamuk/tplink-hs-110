@@ -153,8 +153,9 @@ private executeCommand(command) {
 
     //Callback stuff
     def address = getCallBackAddress()
-    headers.put("CALLBACK", "http://${address}/notify")
+    headers.put("CALLBACK", "http://${address}/")
     headers.put("NT", "upnp:event")
+    headers.put("TIMEOUT", "Second-4200")
 
     def callBack = (command == "consumption") ? "hubPowerResponse" : "hubActionResponse"
 
