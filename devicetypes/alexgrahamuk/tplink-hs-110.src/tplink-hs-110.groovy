@@ -20,7 +20,6 @@ metadata {
         capability "Switch"
         capability "Refresh"
         capability "Power Meter"
-        capability "Configuration"
     }
 
     simulator {
@@ -126,43 +125,6 @@ def poll() {
     message("Executing 'poll'")
     refresh()
 }
-
-///ZWAVE EMU///
-
-def configure() {
-    commands([
-            zwave.associationV1.associationSet(groupingIdentifier: 1, nodeId: zwaveHubNodeId),
-            zwave.configurationV2.configurationSet(configurationValue: [0, 255], parameterNumber: 1, size: 2)
-    ])
-}
-
-
-private command(physicalgraph.zwave.Command cmd) {
-    if (state.sec != 0) {
-        zwave.securityV1.securityMessageEncapsulation().encapsulate(cmd).format()
-    } else {
-        cmd.format()
-    }
-}
-
-private commands(commands, delay=1000) {
-    delayBetween(commands.collect{ command(it) }, delay)
-}
-
-def zwaveEvent(physicalgraph.zwave.commands.meterv3.MeterReport cmd) {
-
-    def powerValue = cmd.scaledMeterValue
-    sendEvent(name: "power", value: powerValue, descriptionText: '{{ device.displayName }} power is {{ value }} Watts', translatable: true )
-    log.debug("power: $powerValue Watts")
-
-}
-
-def zwaveEvent(physicalgraph.zwave.Command cmd) {
-    log.debug "Unhandled: $cmd"
-    null
-}
-
-///
 
 
 private executeCommand(command) {
