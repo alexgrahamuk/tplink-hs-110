@@ -153,8 +153,7 @@ private executeCommand(command) {
 
     //Callback stuff
     def address = getCallBackAddress()
-    def ip = getHostAddress()
-    headers.put("CALLBACK", "<http://${address}/notify$callbackPath>")
+    headers.put("CALLBACK", "<http://${address}/notify>")
     headers.put("NT", "upnp:event")
 
     def callBack = (command == "consumption") ? "hubPowerResponse" : "hubActionResponse"
@@ -173,36 +172,23 @@ private executeCommand(command) {
 }
 
 //Callback Stuff
-
 private getCallBackAddress() {
-    return device.hub.getDataValue("localIP") + ":" + device.hub.getDataValue("localSrvPortTCP")
-}
-
-// gets the address of the device
-private getHostAddress() {
-    def ip = getDataValue("ip")
-    def port = getDataValue("port")
-
-    if (!ip || !port) {
-        def parts = device.deviceNetworkId.split(":")
-        if (parts.length == 2) {
-            ip = parts[0]
-            port = parts[1]
-        } else {
-            log.warn "Can't figure out ip and port for device: ${device.id}"
-        }
-    }
-
-    log.debug "Using IP: $ip and port: $port for device: ${device.id}"
-    return convertHexToIP(ip) + ":" + convertHexToInt(port)
+    device.hub.getDataValue("localIP") + ":" + device.hub.getDataValue("localSrvPortTCP")
 }
 
 private Integer convertHexToInt(hex) {
-    return Integer.parseInt(hex,16)
+    Integer.parseInt(hex,16)
 }
 
 private String convertHexToIP(hex) {
-    return [convertHexToInt(hex[0..1]),convertHexToInt(hex[2..3]),convertHexToInt(hex[4..5]),convertHexToInt(hex[6..7])].join(".")
+    [convertHexToInt(hex[0..1]),convertHexToInt(hex[2..3]),convertHexToInt(hex[4..5]),convertHexToInt(hex[6..7])].join(".")
+}
+
+private getHostAddress() {
+    def parts = device.deviceNetworkId.split(":")
+    def ip = convertHexToIP(parts[0])
+    def port = convertHexToInt(parts[1])
+    return ip + ":" + port
 }
 
 //Utils
