@@ -16,7 +16,7 @@
 
 metadata {
     definition(name: "tplink-hs-110", namespace: "alexgrahamuk", author: "Alex Graham") {
-        capability "Configuration"
+        capability "Polling"
         capability "Switch"
         capability "Refresh"
         capability "Power Meter"
@@ -121,24 +121,9 @@ def hubPowerResponse(response) {
     }
 }
 
-def configure() {
-
-    message("Set checkInterval")
-    sendEvent(name: "checkInterval", value: 10, displayed: false, data: [hubHardwareId: device.hub.hardwareID])
+def polling() {
+    message("Executing 'polling'")
     refresh()
-}
-
-
-def powerConfig() {
-    [
-            "zdo bind 0x${device.deviceNetworkId} 1 ${endpointId} 0x0B04 {${device.zigbeeId}} {}", "delay 200",
-            "send 0x${device.deviceNetworkId} 1 ${endpointId}", "delay 500"
-    ]
-}
-
-
-private getEndpointId() {
-    new BigInteger(device.endpointId, 16).toString()
 }
 
 private executeCommand(command) {
