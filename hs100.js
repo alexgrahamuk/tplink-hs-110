@@ -17,9 +17,16 @@ function onRequest(request, response){
 
     //Callback
     var hubCallBack = request.headers["CALLBACK"];
-    var hubCallBackAction = request.headers["CALLBACK_ACTION"];
+    var hubCallBackAction = request.headers["NT"];
     console.log(hubCallBack);
     console.log(hubCallBackAction);
+
+    var request = require('request');
+    request(hubCallBack, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+            console.log(body) // Print the google web page.
+        }
+    })
 
     var msg = '';
     var date = new Date();
