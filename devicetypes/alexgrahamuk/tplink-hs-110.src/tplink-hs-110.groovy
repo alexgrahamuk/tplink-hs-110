@@ -1,7 +1,7 @@
 /**
  *  tplink-hs-100
  *
- *  Copyright 2016 Dan Logan
+ *  Copyright 2016 `
  *
  *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  *  in compliance with the License. You may obtain a copy of the License at:
@@ -19,6 +19,7 @@ metadata {
         capability "Switch"
         capability "Refresh"
         capability "Polling"
+        capability "Power Meter"
     }
 
     simulator {
@@ -26,19 +27,23 @@ metadata {
     }
 
     tiles {
-        standardTile("switch", "device.switch", width: 2, height: 2, canChangeIcon: true) {
-            state "off", label: 'Off', action: "switch.on",
-                    icon: "st.switches.switch.off", backgroundColor: "#ffffff"
-            state "on", label: 'On', action: "switch.off",
-                    icon: "st.switches.switch.on", backgroundColor: "#79b821"
+
+        multiAttributeTile(name:"switch", type: "device.switch", width: 6, height: 4, canChangeIcon: true){
+            tileAttribute ("device.switch", key: "PRIMARY_CONTROL") {
+                attributeState "on", label: 'On', action: "switch.off", icon: "st.switches.switch.on", backgroundColor: "#79b821"
+                attributeState "off", label: 'Off', action: "switch.on", icon: "st.switches.switch.off", backgroundColor: "#ffffff"
+          }
+            tileAttribute ("power", key: "SECONDARY_CONTROL") {
+                attributeState "power", label:'${currentValue} W'
+            }
         }
 
-        standardTile("refresh", "capability.refresh", width: 1, height: 1, decoration: "flat") {
-            state("default", label: "Refresh", action: "refresh.refresh", icon: "st.secondary.refresh")
+        standardTile("refresh", "device.power", width: 2, height: 2, decoration: "flat") {
+            state("default", label: "", action: "refresh.refresh", icon: "st.secondary.refresh")
         }
 
         main("switch")
-        details(["switch"])
+        details(["switch","refresh"])
     }
 
     command "on"
@@ -108,6 +113,7 @@ def hubActionResponse(response) {
     message("switch status: '${status}'")
     if (status != "") {
         sendEvent(name: "switch", value: status, isStateChange: true)
+        sendEvent(name: "power", value: status, isStateChange: true)
     }
 
 }
