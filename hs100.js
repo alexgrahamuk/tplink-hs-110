@@ -40,6 +40,19 @@ function onRequest(request, response){
                 response.end(msg);
             });
             break;
+        case "consumption":
+            console.log("consumption");
+            console.log(deviceIP + ":" + command);
+            var p = Promise.resolve(hs100.getConsumption());
+            p.then(function(data){
+                console.log(data);
+                //var state = ((data) ? "on" : "off");
+                var state = "mega";
+                msg = "you checked " + deviceIP +  " status:" + state;
+                response.setHeader("x-hs100-status", data);
+                response.end(msg);
+            });
+            break;
         default:
             response.end('hs100');
     }
