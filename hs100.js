@@ -47,7 +47,7 @@ function onRequest(request, response){
             p.then(function(data){
                 var state = (data && data.get_realtime && data.get_realtime.power) ? data.get_realtime.power : "";
                 msg = "you checked " + deviceIP +  " status:" + state;
-                response.setHeader("x-hs100-status", data);
+                response.setHeader("x-hs100-status", state);
                 response.end(msg);
             });
             break;
