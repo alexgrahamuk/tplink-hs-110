@@ -16,6 +16,7 @@
 
 metadata {
     definition(name: "tplink-hs-110", namespace: "alexgrahamuk", author: "Alex Graham") {
+        capability "Configuration"
         capability "Switch"
         capability "Refresh"
         capability "Power Meter"
@@ -47,9 +48,6 @@ metadata {
         details(["switch","refresh"])
     }
 
-    //command "on"
-    //command "off"
-
 }
 
 preferences {
@@ -64,8 +62,9 @@ def message(msg) {
 
 // parse events into attributes
 def parse(String description) {
-    //message("Parsing '${description}'")
-    log.debug "parsing"
+
+    message("Parsing: $description")
+
     def msg = parseLanMessage(description)
 
     def headersAsString = msg.header // => headers as a string
@@ -75,21 +74,13 @@ def parse(String description) {
     def json = msg.json              // => any JSON included in response body, as a data structure of lists and maps
     def xml = msg.xml                // => any XML included in response body, as a document tree structure
     def data = msg.data
-    // => either JSON or XML in response body (whichever is specified by content-type header in response)
-    //message(msg.body)
-    //message(headerAsString)
-
-    //status = headerMap["x-hs100-status"] ?: ""
-    //message("switch status: '${status}'")
-    //if (status != "") {
-    //  sendEvent(name: "switch", value: status, isStateChange: true)
-    //}
 
     //def uuid = UUID.randomUUID().toString()
     //device.deviceNetworkId = "tp_link_${uuid}"
 }
 
 def refresh() {
+    message("Executing 'refresh'")
     executeCommand("status")
     executeCommand("consumption")
 }
@@ -108,8 +99,8 @@ def off() {
 }
 
 def hubActionResponse(response) {
+
     message("Executing 'hubActionResponse': '${device.deviceNetworkId}'")
-    //message(response)
 
     def status = response.headers["x-hs100-status"] ?: ""
     message("switch status: '${status}'")
@@ -120,8 +111,8 @@ def hubActionResponse(response) {
 }
 
 def hubPowerResponse(response) {
+
     message("Executing 'hubPowerResponse': '${device.deviceNetworkId}'")
-    //message(response)
 
     def status = response.headers["x-hs100-status"] ?: "0"
     message("switch power consumption: '${status}'")
@@ -132,7 +123,22 @@ def hubPowerResponse(response) {
 
 def configure() {
 
-    sendEvent(name: "checkInterval", value: 1 * 60, displayed: false, data: [hubHardwareId: device.hub.hardwareID])
+    message("Set checkInterval")
+    sendEvent(name: "checkInterval", value: 10, displayed: false, data: [hubHardwareId: device.hub.hardwareID])
+    refresh()
+}
+
+
+def powerConfig() {
+    [
+            "zdo bind 0x${device.deviceNetworkId} 1 ${endpointId} 0x0B04 {${device.zigbeeId}} {}", "delay 200",
+            "send 0x${device.deviceNetworkId} 1 ${endpointId}", "delay 500"
+    ]
+}
+
+
+private getEndpointId() {
+    new BigInteger(device.endpointId, 16).toString()
 }
 
 private executeCommand(command) {
@@ -150,8 +156,6 @@ private executeCommand(command) {
 
     def callBack = (command == "consumption") ? "hubPowerResponse" : "hubActionResponse"
 
-    //message("x-hs100-ip: '$outletIP'")
-    //message("executeCommand: '${command}'")
     try {
         sendHubCommand(new physicalgraph.device.HubAction([
                 method : "GET",
