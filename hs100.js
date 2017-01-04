@@ -16,8 +16,8 @@ function onRequest(request, response){
     var hs100 = new hs100api.Client().getPlug({host:deviceIP});
 
     //Callback
-    var hubCallBack = request.headers["CALLBACK"];
-    var hubCallBackAction = request.headers["NT"];
+    var hubCallBack = request.headers["callback"];
+    var hubCallBackAction = request.headers["nt"];
     console.log(hubCallBack);
     console.log(hubCallBackAction);
 
