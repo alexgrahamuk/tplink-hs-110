@@ -143,10 +143,6 @@ private executeCommand(command) {
     def gatewayIPHex = convertIPtoHex(gatewayIP)
     def gatewayPortHex = convertPortToHex(gatewayPort)
 
-    //For callback
-    def address = getCallBackAddress()
-    def ip = getHostAddress()
-
     message(device.deviceNetworkId)
     message("gateway port: $gatewayIP:$gatewayPort")
 
@@ -155,7 +151,9 @@ private executeCommand(command) {
     headers.put("x-hs100-ip", outletIP)
     headers.put("x-hs100-command", command)
 
-    //Calback stuff
+    //Callback stuff
+    def address = getCallBackAddress()
+    def ip = getHostAddress()
     headers.put("CALLBACK", "<http://${address}/notify$callbackPath>")
     headers.put("NT", "upnp:event")
 
@@ -173,6 +171,41 @@ private executeCommand(command) {
         message(e.message)
     }
 }
+
+//Callback Stuff
+
+private getCallBackAddress() {
+    return device.hub.getDataValue("localIP") + ":" + device.hub.getDataValue("localSrvPortTCP")
+}
+
+// gets the address of the device
+private getHostAddress() {
+    def ip = getDataValue("ip")
+    def port = getDataValue("port")
+
+    if (!ip || !port) {
+        def parts = device.deviceNetworkId.split(":")
+        if (parts.length == 2) {
+            ip = parts[0]
+            port = parts[1]
+        } else {
+            log.warn "Can't figure out ip and port for device: ${device.id}"
+        }
+    }
+
+    log.debug "Using IP: $ip and port: $port for device: ${device.id}"
+    return convertHexToIP(ip) + ":" + convertHexToInt(port)
+}
+
+private Integer convertHexToInt(hex) {
+    return Integer.parseInt(hex,16)
+}
+
+private String convertHexToIP(hex) {
+    return [convertHexToInt(hex[0..1]),convertHexToInt(hex[2..3]),convertHexToInt(hex[4..5]),convertHexToInt(hex[6..7])].join(".")
+}
+
+//Utils
 
 private String convertIPtoHex(ipAddress) {
     String hex = ipAddress.tokenize('.').collect { String.format('%02x', it.toInteger()) }.join()
