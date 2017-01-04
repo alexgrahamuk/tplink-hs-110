@@ -28,7 +28,7 @@ metadata {
 
     tiles(scale: 2) {
 
-        multiAttributeTile(name:"switch", type: "lighting", width: 6, height: 4, canChangeIcon: true){
+        multiAttributeTile(name:"switch", type: "device.switch", width: 6, height: 4, canChangeIcon: true){
             tileAttribute ("device.switch", key: "PRIMARY_CONTROL") {
                 attributeState "on", label: 'On', action: "switch.off", icon: "st.switches.switch.on", backgroundColor: "#79b821", nextState: "turningOff"
                 attributeState "off", label: 'Off', action: "switch.on", icon: "st.switches.switch.off", backgroundColor: "#ffffff", nextState: "turningOn"
@@ -36,7 +36,7 @@ metadata {
                 attributeState "turningOff", label: 'Turning Off', action: "switch.on", icon: "st.switches.switch.off", backgroundColor: "#ffffff", nextState: "turningOn"
           }
             tileAttribute ("power", key: "SECONDARY_CONTROL") {
-                attributeState "power", label:'${currentValue} W'
+                attributeState "power", label:'${currentValue} W', action: "switch.power"
             }
         }
 
@@ -47,6 +47,10 @@ metadata {
         main "switch"
         details(["switch","refresh"])
     }
+
+    command "on"
+    command "off"
+    command "power"
 
 }
 
@@ -82,7 +86,7 @@ def parse(String description) {
 def refresh() {
     message("Executing 'refresh'")
     executeCommand("status")
-    executeCommand("consumption")
+    power()
 }
 
 // handle commands
@@ -90,12 +94,19 @@ def on() {
     message("Executing 'on'")
     executeCommand("on")
     sendEvent(name: "switch", value: "on", isStateChange: true)
+    power()
 }
 
 def off() {
     message("Executing 'off'")
     executeCommand("off")
     sendEvent(name: "switch", value: "off", isStateChange: true)
+    power()
+}
+
+def power() {
+    message("Executing 'power'")
+    executeCommand("consumption")
 }
 
 def hubActionResponse(response) {
