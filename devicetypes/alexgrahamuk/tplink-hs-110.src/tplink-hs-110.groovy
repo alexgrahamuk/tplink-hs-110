@@ -114,13 +114,24 @@ def hubActionResponse(response) {
     message("switch status: '${status}'")
     if (status != "") {
         sendEvent(name: "switch", value: status, isStateChange: true)
-        sendEvent(name: "power", value: status, isStateChange: true)
     }
 
 }
 
+def hubPowerResponse(response) {
+    message("Executing 'hubPowerResponse': '${device.deviceNetworkId}'")
+    //message(response)
+
+    def status = response.headers["x-hs100-status"] ?: ""
+    message("switch power consumption: '${status}'")
+    if (status != "") {
+        sendEvent(name: "power", value: status, isStateChange: true)
+    }
+}
+
 def poll() {
     executeCommand("status")
+    executeCommand("consumption")
 }
 
 private executeCommand(command) {
@@ -136,6 +147,8 @@ private executeCommand(command) {
     headers.put("x-hs100-ip", outletIP)
     headers.put("x-hs100-command", command)
 
+    def callBack = (command == "consumption") ? "hubPowerResponse" : "hubActionResponse"
+
     //message("x-hs100-ip: '$outletIP'")
     //message("executeCommand: '${command}'")
     try {
@@ -144,7 +157,7 @@ private executeCommand(command) {
                 path   : "/",
                 headers: headers],
                 device.deviceNetworkId,
-                [callback: "hubActionResponse"]
+                [callback: callBack]
         ))
     } catch (e) {
         message(e.message)

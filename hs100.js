@@ -45,9 +45,7 @@ function onRequest(request, response){
             console.log(deviceIP + ":" + command);
             var p = Promise.resolve(hs100.getConsumption());
             p.then(function(data){
-                console.log(data);
-                //var state = ((data) ? "on" : "off");
-                var state = "mega";
+                var state = (data && data.get_realtime && data.get_realtime.power) ? data.get_realtime.power : "";
                 msg = "you checked " + deviceIP +  " status:" + state;
                 response.setHeader("x-hs100-status", data);
                 response.end(msg);
