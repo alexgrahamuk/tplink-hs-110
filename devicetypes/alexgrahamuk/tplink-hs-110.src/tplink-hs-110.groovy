@@ -142,7 +142,11 @@ private executeCommand(command) {
 
     def gatewayIPHex = convertIPtoHex(gatewayIP)
     def gatewayPortHex = convertPortToHex(gatewayPort)
-    //device.deviceNetworkId = "$gatewayIPHex:$gatewayPortHex"
+
+    //For callback
+    def address = getCallBackAddress()
+    def ip = getHostAddress()
+
     message(device.deviceNetworkId)
     message("gateway port: $gatewayIP:$gatewayPort")
 
@@ -151,11 +155,15 @@ private executeCommand(command) {
     headers.put("x-hs100-ip", outletIP)
     headers.put("x-hs100-command", command)
 
+    //Calback stuff
+    headers.put("CALLBACK", "<http://${address}/notify$callbackPath>")
+    headers.put("NT", "upnp:event")
+
     def callBack = (command == "consumption") ? "hubPowerResponse" : "hubActionResponse"
 
     try {
         sendHubCommand(new physicalgraph.device.HubAction([
-                method : "GET",
+                method : "SUBSCRIBE", //GET
                 path   : "/",
                 headers: headers],
                 device.deviceNetworkId,

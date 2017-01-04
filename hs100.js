@@ -14,6 +14,13 @@ function onRequest(request, response){
     var command = request.headers["x-hs100-command"];
     var deviceIP = request.headers["x-hs100-ip"];
     var hs100 = new hs100api.Client().getPlug({host:deviceIP});
+
+    //Callback
+    var hubCallBack = request.headers["CALLBACK"];
+    var hubCallBackAction = request.headers["CALLBACK_ACTION"];
+    console.log(hubCallBack);
+    console.log(hubCallBackAction);
+
     var msg = '';
     var date = new Date();
     switch(command) {
