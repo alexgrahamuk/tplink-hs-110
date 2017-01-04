@@ -90,6 +90,7 @@ def parse(String description) {
 
 def refresh() {
     executeCommand("status")
+    executeCommand("consumption")
 }
 
 // handle commands
