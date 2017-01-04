@@ -121,8 +121,8 @@ def hubPowerResponse(response) {
     }
 }
 
-def polling() {
-    message("Executing 'polling'")
+def poll() {
+    message("Executing 'poll'")
     refresh()
 }
 
