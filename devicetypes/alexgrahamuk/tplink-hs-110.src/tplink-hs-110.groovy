@@ -50,6 +50,7 @@ metadata {
 
     command "on"
     command "off"
+    command "refresh"
 }
 
 preferences {

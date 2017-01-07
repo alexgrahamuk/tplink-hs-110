@@ -31,5 +31,41 @@ def updated() {
 }
 
 def initialize() {
-    // TODO: subscribe to attributes, devices, locations, etc.
+
+    subscribe(devices, "switch.on", "switchOnHandler")
+    subscribe(devices, "switch.off", "switchOffHandler")
+    subscribe(devices, "switch.refresh", "switchRefreshHandler")
+
+    /*def headers = [:]
+    headers.put("HOST", "$gatewayIP:$gatewayPort")
+    headers.put("x-hs110-ip", outletIP)
+    headers.put("x-hs110-command", command)
+    headers.put("callback", getCallBackAddress())
+
+    try {
+        sendHubCommand(new physicalgraph.device.HubAction([
+                method : "POST",
+                path   : "/",
+                headers: headers],
+                device.deviceNetworkId,
+                [callback: "hubActionResponse"]
+        ))
+    } catch (e) {
+        message(e.message)
+    }*/
+}
+
+def switchOnHandler(evt)
+{
+    log.debug("A switch turned on")
+}
+
+def switchOffHandler(evt)
+{
+    log.debug("A switch turned off")
+}
+
+def switchRefreshHandler(evt)
+{
+    log.debug("A switch was refreshed")
 }
