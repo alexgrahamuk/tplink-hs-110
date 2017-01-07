@@ -87,6 +87,7 @@ def parse(String description) {
 def refresh() {
     message("Executing 'refresh'")
     executeCommand("status")
+    sendEvent(name: "refresh", value: "refresh", isStateChange: true)
 }
 
 // handle commands
