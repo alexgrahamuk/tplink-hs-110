@@ -1,5 +1,5 @@
 definition(
-        name: "TP Link HS-110 (Connect)",
+        name: "TPLink HS-110 (Connect)",
         namespace: "alexgrahamuk",
         author: "Alex Graham",
         description: "Allows you to connect your HS-110 energy monitored sockets using the alexgrahamuk hs-110-server.",
