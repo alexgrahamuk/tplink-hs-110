@@ -2,10 +2,10 @@ definition(
         name: "TP Link HS-110 (Connect)",
         namespace: "alexgrahamuk",
         author: "Alex Graham",
-        description: "Allows you to connect your HS-110 energy monitored sockets using the alexgrahamuk/hs-110-server.",
+        description: "Allows you to connect your HS-110 energy monitored sockets using the alexgrahamuk hs-110-server.",
         category: "My Apps",
-        iconUrl: "https://s3.amazonaws.com/smartapp-icons/Partner/hue.png", //change me
-        iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Partner/hue@2x.png", //change me
+        iconUrl: "https://s3.amazonaws.com/smartapp-icons/Partner/hue.png",
+        iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Partner/hue@2x.png",
         singleInstance: true
 )
 
