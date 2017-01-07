@@ -20,6 +20,10 @@ metadata {
         capability "Switch"
         capability "Refresh"
         capability "Power Meter"
+
+        command "on"
+        command "off"
+        command "refresh"
     }
 
     simulator {
@@ -40,17 +44,13 @@ metadata {
             }
         }
 
-        standardTile("refresh", "device.switch", inactiveLabel: false, decoration: "flat", width: 2, height: 2) {
+        standardTile("refresh", "command.refresh", inactiveLabel: false, decoration: "flat", width: 2, height: 2) {
             state "default", label:'', action:"refresh.refresh", icon:"st.secondary.refresh"
         }
 
         main "switch"
         details(["switch","refresh"])
     }
-
-    command "on"
-    command "off"
-    command "refresh"
 }
 
 preferences {
