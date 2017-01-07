@@ -11,7 +11,7 @@ definition(
 
 preferences {
     section("Devices") {
-        input(name: "devices", type: "device.tplink-hs-110", title: "HS-110 Switches", required: true, displayDuringSetup: true, multiple: true)
+        input(name: "devices", type: "device.tplinkSocketWithPowerMeter", title: "HS-110 Switches", required: true, displayDuringSetup: true, multiple: true)
     }
     section("Gateway") {
         input("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true)

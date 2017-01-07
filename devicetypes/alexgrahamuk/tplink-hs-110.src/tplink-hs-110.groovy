@@ -15,7 +15,7 @@
  */
 
 metadata {
-    definition(name: "Tplink-hs-110", namespace: "alexgrahamuk", author: "Alex Graham") {
+    definition(name: "Tplink Socket With Power Meter", namespace: "alexgrahamuk", author: "Alex Graham") {
         capability "Polling"
         capability "Switch"
         capability "Refresh"
