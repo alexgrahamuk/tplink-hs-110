@@ -34,7 +34,7 @@ metadata {
                 attributeState "off", label: 'Off', action: "switch.on", icon: "st.switches.switch.off", backgroundColor: "#ffffff", nextState: "turningOn"
                 attributeState "turningOn", label: 'Turning On', action: "switch.off", icon: "st.switches.switch.on", backgroundColor: "#79b821", nextState: "turningOff"
                 attributeState "turningOff", label: 'Turning Off', action: "switch.on", icon: "st.switches.switch.off", backgroundColor: "#ffffff", nextState: "turningOn"
-          }
+            }
             tileAttribute ("power", key: "SECONDARY_CONTROL") {
                 attributeState "power", label:'${currentValue} W'
             }
@@ -50,10 +50,13 @@ metadata {
 
     command "on"
     command "off"
-    command "power"
-
 }
 
+preferences {
+    input("outletIP", "text", title: "Outlet IP", required: true, displayDuringSetup: true)
+    input("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true)
+    input("gatewayPort", "text", title: "Gateway Port", required: true, displayDuringSetup: true)
+}
 
 def message(msg) {
     log.debug(msg)
@@ -74,6 +77,8 @@ def parse(String description) {
     def xml = msg.xml                // => any XML included in response body, as a document tree structure
     def data = msg.data
 
+    sendEvent(name: "power", value: "123", isStateChange: true)
+
     //def uuid = UUID.randomUUID().toString()
     //device.deviceNetworkId = "tp_link_${uuid}"
 }
@@ -81,7 +86,6 @@ def parse(String description) {
 def refresh() {
     message("Executing 'refresh'")
     executeCommand("status")
-    power()
 }
 
 // handle commands
@@ -89,19 +93,14 @@ def on() {
     message("Executing 'on'")
     executeCommand("on")
     sendEvent(name: "switch", value: "on", isStateChange: true)
-    power()
+    sendEvent(name: "power", value: "0", isStateChange: true)
 }
 
 def off() {
     message("Executing 'off'")
     executeCommand("off")
     sendEvent(name: "switch", value: "off", isStateChange: true)
-    power()
-}
-
-def power() {
-    message("Executing 'power'")
-    executeCommand("consumption")
+    sendEvent(name: "power", value: "0", isStateChange: true)
 }
 
 def hubActionResponse(response) {
@@ -116,20 +115,8 @@ def hubActionResponse(response) {
 
 }
 
-def hubPowerResponse(response) {
-
-    message("Executing 'hubPowerResponse': '${device.deviceNetworkId}'")
-
-    def status = response.headers["x-hs100-status"] ?: "0"
-    message("switch power consumption: '${status}'")
-    if (status != "") {
-        sendEvent(name: "power", value: status, isStateChange: true)
-    }
-}
-
 def poll() {
     message("Executing 'poll'")
-    refresh()
 }
 
 
@@ -138,29 +125,21 @@ private executeCommand(command) {
     def gatewayIPHex = convertIPtoHex(gatewayIP)
     def gatewayPortHex = convertPortToHex(gatewayPort)
 
-    message(device.deviceNetworkId)
-    message("gateway port: $gatewayIP:$gatewayPort")
+    device.deviceNetworkId = "000C290D21CC"
 
     def headers = [:]
     headers.put("HOST", "$gatewayIP:$gatewayPort")
-    headers.put("x-hs100-ip", outletIP)
-    headers.put("x-hs100-command", command)
-
-    //Callback stuff
-    def address = getCallBackAddress()
-    headers.put("CALLBACK", "http://${address}/")
-    headers.put("NT", "upnp:event")
-    headers.put("TIMEOUT", "Second-4200")
-
-    def callBack = (command == "consumption") ? "hubPowerResponse" : "hubActionResponse"
+    headers.put("x-hs110-ip", outletIP)
+    headers.put("x-hs110-command", command)
+    headers.put("callback", getCallBackAddress())
 
     try {
         sendHubCommand(new physicalgraph.device.HubAction([
-                method : "SUBSCRIBE", //GET
+                method : "POST",
                 path   : "/",
                 headers: headers],
                 device.deviceNetworkId,
-                [callback: callBack]
+                [callback: "hubActionResponse"]
         ))
     } catch (e) {
         message(e.message)
