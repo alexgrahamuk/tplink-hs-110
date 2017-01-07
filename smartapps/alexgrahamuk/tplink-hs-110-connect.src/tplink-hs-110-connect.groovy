@@ -34,7 +34,10 @@ def initialize() {
 
     subscribe(devices, "switch.on", "switchOnHandler")
     subscribe(devices, "switch.off", "switchOffHandler")
+    subscribe(devices, "switch", "switchRefreshHandler")
+    subscribe(devices, "command", "switchRefreshHandler")
     subscribe(devices, "refresh", "switchRefreshHandler")
+    subscribe(devices, "tile", "switchRefreshHandler")
 
     /*def headers = [:]
     headers.put("HOST", "$gatewayIP:$gatewayPort")
