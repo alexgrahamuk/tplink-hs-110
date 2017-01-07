@@ -54,11 +54,6 @@ metadata {
 
 }
 
-preferences {
-    input("outletIP", "text", title: "Outlet IP", required: true, displayDuringSetup: true)
-    input("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true)
-    input("gatewayPort", "text", title: "Gateway Port", required: true, displayDuringSetup: true)
-}
 
 def message(msg) {
     log.debug(msg)
