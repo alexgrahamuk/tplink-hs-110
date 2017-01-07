@@ -1,0 +1,11 @@
+{
+  "name": "hs-100-api-bridge",
+  "version": "1.0.0",
+  "author": "none",
+  "scripts": {
+  },
+  "dependencies": {
+    "hs100-api":"*"
+  },
+  "private":true
+}
