@@ -15,7 +15,7 @@
  */
 
 metadata {
-    definition(name: "tplink-hs-110", namespace: "alexgrahamuk", author: "Alex Graham") {
+    definition(name: "Tplink-hs-110", namespace: "alexgrahamuk", author: "Alex Graham") {
         capability "Polling"
         capability "Switch"
         capability "Refresh"
