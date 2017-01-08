@@ -44,19 +44,19 @@ def switchOnHandler(evt)
     log.debug("A switch turned on")
     log.debug(evt.getDevice().deviceNetworkId)
     gateway.poll()
-    gateway.executeCommand("on", evt.getDevice().outletIP, evt.getDevice().deviceNetworkId)
+    gateway.executeCommand("on", evt.getDevice().currentValue('outletIP'), evt.getDevice().deviceNetworkId)
 }
 
 def switchOffHandler(evt)
 {
     log.debug("A switch turned off")
-    gateway.executeCommand("off", evt.getDevice().outletIP, evt.getDevice().deviceNetworkId)
+    gateway.executeCommand("off", evt.getDevice().currentValue('outletIP'), evt.getDevice().deviceNetworkId)
 }
 
 def switchRefreshHandler(evt)
 {
     log.debug("A switch was refreshed")
-    gateway.executeCommand("status", evt.getDevice().outletIP, evt.getDevice().deviceNetworkId)
+    gateway.executeCommand("status", evt.getDevice().currentValue('outletIP'), evt.getDevice().deviceNetworkId)
 }
 
 def switchStatusHandler(evt) {
