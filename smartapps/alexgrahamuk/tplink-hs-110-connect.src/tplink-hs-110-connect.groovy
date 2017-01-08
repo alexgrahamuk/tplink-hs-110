@@ -14,22 +14,10 @@ preferences {
         input(name: "devices", type: "device.tplinkSocketWithPowerMeter", title: "HS-110 Switches", required: true, displayDuringSetup: true, multiple: true)
     }
     section("Gateway") {
-        input("gatewayIP", "text", title: "Gateway IP", required: true, displayDuringSetup: true)
-        input("gatewayPort", "text", title: "Gateway Port", required: true, displayDuringSetup: true)
+        input(name: "gateway", type: "device.tplinkSocketGateway", title: "HS-110 Gateway", required: true, displayDuringSetup: true, multiple: false)
     }
 }
 
-mappings {
-    path("/hs110") {
-        action: [
-            GET: "getCheese"
-        ]
-    }
-}
-
-def getCheese() {
-	return [meh: "Sausage"]
-}
 
 def installed() {
     log.debug "Installed with settings: ${settings}"
@@ -38,7 +26,7 @@ def installed() {
 
 def updated() {
     log.debug "Updated with settings: ${settings}"
-    //   unsubscribe()
+    unsubscribe()
     initialize()
 }
 
@@ -47,46 +35,47 @@ def initialize() {
     subscribe(devices, "switch.on", "switchOnHandler")
     subscribe(devices, "switch.off", "switchOffHandler")
     subscribe(devices, "refresh.refresh", "switchRefreshHandler")
-    subscribe(devices, "hubInfo", "testHub")
+    subscribe(gateway, "ping", "switchStatusHandler")
 
-    /*def headers = [:]
-    headers.put("HOST", "$gatewayIP:$gatewayPort")
-    headers.put("x-hs110-ip", outletIP)
-    headers.put("x-hs110-command", command)
-    headers.put("callback", getCallBackAddress())
-
-    try {
-        sendHubCommand(new physicalgraph.device.HubAction([
-                method : "POST",
-                path   : "/",
-                headers: headers],
-                device.deviceNetworkId,
-                [callback: "hubActionResponse"]
-        ))
-    } catch (e) {
-        message(e.message)
-    }*/
 }
 
 def switchOnHandler(evt)
 {
     log.debug("A switch turned on")
+    gateway.executeCommand("on", evt.getDevice().deviceNetworkId)
 }
 
 def switchOffHandler(evt)
 {
     log.debug("A switch turned off")
+    gateway.executeCommand("off", evt.getDevice().deviceNetworkId)
 }
 
 def switchRefreshHandler(evt)
 {
     log.debug("A switch was refreshed")
+    gateway.executeCommand("status", evt.getDevice().deviceNetworkId)
 }
 
-def testHub(evt) {
-	log.debug(evt.value)
-}
+def switchStatusHandler(evt) {
 
-def testParent() {
-	log.debug("Parent test")
+    log.debug("A switch was queried for status")
+
+    def description = evt.value
+    message("Parsing: $description")
+
+    def msg = parseLanMessage(description)
+
+    def headersAsString = msg.header // => headers as a string
+    def headerMap = msg.headers      // => headers as a Map
+    def body = msg.body              // => request body as a string
+    def status = msg.status          // => http status code of the response
+    def json = msg.json              // => any JSON included in response body, as a data structure of lists and maps
+    def xml = msg.xml                // => any XML included in response body, as a document tree structure
+    def data = msg.data
+
+    //def uuid = UUID.randomUUID().toString()
+    //device.deviceNetworkId = "tp_link_${uuid}"
+
+    //sendEvent(name: "power", value: "123", isStateChange: true)
 }

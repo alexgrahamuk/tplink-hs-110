@@ -1,7 +1,10 @@
 var sock = require('net');
 var http = require('http');
 var url = require('url');
+var request = require('request');
+
 var hs100api = require('hs100-api');
+
 
 const PORT = 8083;
 
@@ -13,15 +16,17 @@ function onRequest(request, response){
     //var pathname = url.parse(request.url).pathname;
     var command = request.headers["x-hs100-command"];
     var deviceIP = request.headers["x-hs100-ip"];
+    var deviceNetworkId = request.headers["x-hs100-dnid"];
+
     var hs100 = new hs100api.Client().getPlug({host:deviceIP});
 
     //Callback
     var hubCallBack = request.headers["callback"];
-    var hubCallBackAction = request.headers["nt"];
-    console.log(hubCallBack);
-    console.log(hubCallBackAction);
 
-    var request = require('request');
+    response.end("OK Sausage");
+
+    return;
+
     request(hubCallBack, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             console.log(body) // Print the google web page.
