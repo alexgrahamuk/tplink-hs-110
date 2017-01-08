@@ -60,13 +60,13 @@ def poll() {
 }
 
 
-def executeCommand(command, dnid=null) {
+def executeCommand(command, ip=null, dnid=null) {
 
     device.deviceNetworkId = "000C290D21CC"
 
     def headers = [:]
     headers.put("HOST", "$gatewayIP:$gatewayPort")
-    headers.put("x-hs110-ip", outletIP)
+    headers.put("x-hs110-ip", ip)
     headers.put("x-hs110-command", command)
     headers.put("x-hs110-dnid", dnid)
     headers.put("callback", getCallBackAddress())
