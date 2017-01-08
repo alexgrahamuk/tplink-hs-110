@@ -14,19 +14,18 @@ console.log("The HS-100 controller has started");
 
 function onRequest(request, response){
     //var pathname = url.parse(request.url).pathname;
-    var command = request.headers["x-hs100-command"];
-    var deviceIP = request.headers["x-hs100-ip"];
-    var deviceNetworkId = request.headers["x-hs100-dnid"];
+    var command = request.headers["x-hs110-command"];
+    var deviceIP = request.headers["x-hs110-ip"];
+    var deviceNetworkId = request.headers["x-hs110-dnid"];
+    var hubCallBack = request.headers["callback"];
 
     var hs100 = new hs100api.Client().getPlug({host:deviceIP});
-
-    //Callback
-    var hubCallBack = request.headers["callback"];
 
     console.log("----REQUEST----");
     console.log(command);
     console.log(deviceIP);
     console.log(deviceNetworkId);
+    console.log(hubCallBack)
     console.log("----DONE----");
 
     response.end("OK Sausage");
