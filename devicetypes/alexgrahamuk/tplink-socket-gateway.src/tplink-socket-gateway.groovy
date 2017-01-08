@@ -18,6 +18,8 @@ metadata {
     definition(name: "Tplink Socket Gateway", namespace: "alexgrahamuk", author: "Alex Graham") {
         capability "Polling"
         capability "Sensor"
+
+        command "executeCommand"
     }
 
     simulator {
