@@ -19,6 +19,18 @@ preferences {
     }
 }
 
+mappings {
+    path("/hs110") {
+        action: [
+            GET: "getCheese"
+        ]
+    }
+}
+
+def getCheese() {
+	return [meh: "Sausage"]
+}
+
 def installed() {
     log.debug "Installed with settings: ${settings}"
     initialize()
@@ -35,6 +47,7 @@ def initialize() {
     subscribe(devices, "switch.on", "switchOnHandler")
     subscribe(devices, "switch.off", "switchOffHandler")
     subscribe(devices, "refresh.refresh", "switchRefreshHandler")
+    subscribe(devices, "hubInfo", "testHub")
 
     /*def headers = [:]
     headers.put("HOST", "$gatewayIP:$gatewayPort")
@@ -68,4 +81,12 @@ def switchOffHandler(evt)
 def switchRefreshHandler(evt)
 {
     log.debug("A switch was refreshed")
+}
+
+def testHub(evt) {
+	log.debug(evt.value)
+}
+
+def testParent() {
+	log.debug("Parent test")
 }
