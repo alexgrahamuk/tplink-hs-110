@@ -23,6 +23,12 @@ function onRequest(request, response){
     //Callback
     var hubCallBack = request.headers["callback"];
 
+    console.log("----REQUEST----");
+    console.log(command);
+    console.log(deviceIP);
+    console.log(deviceNetworkId);
+    console.log("----DONE----");
+
     response.end("OK Sausage");
 
     return;
