@@ -42,6 +42,8 @@ def initialize() {
 def switchOnHandler(evt)
 {
     log.debug("A switch turned on")
+    log.debug(evt.getDevice().deviceNetworkId)
+    gateway.poll()
     gateway.executeCommand("on", evt.getDevice().deviceNetworkId)
 }
 

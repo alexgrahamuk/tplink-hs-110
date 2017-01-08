@@ -60,7 +60,7 @@ def poll() {
 }
 
 
-def executeCommand(command, dnid) {
+def executeCommand(command, dnid=null) {
 
     device.deviceNetworkId = "000C290D21CC"
 
