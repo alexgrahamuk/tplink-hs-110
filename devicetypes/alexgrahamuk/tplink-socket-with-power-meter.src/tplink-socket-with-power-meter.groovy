@@ -67,7 +67,7 @@ def message(msg) {
 def parse(String description) {
 
     message("Parsing: $description")
-
+    
     def msg = parseLanMessage(description)
 
     def headersAsString = msg.header // => headers as a string
@@ -82,6 +82,10 @@ def parse(String description) {
 
     //def uuid = UUID.randomUUID().toString()
     //device.deviceNetworkId = "tp_link_${uuid}"
+    
+    def myEvt = createEvent(name:"hubInfo", value:"This is a test (hardcoded)", isStateChange: true)
+    
+    return myEvt
 }
 
 def refresh() {
