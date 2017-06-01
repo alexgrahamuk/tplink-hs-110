@@ -1,11 +1,28 @@
+/**
+ *  TPLink HS-110 (Connect)
+ *
+ *  Copyright 2016 `
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ *  in compliance with the License. You may obtain a copy of the License at:
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software distributed under the License is distributed
+ *  on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License
+ *  for the specific language governing permissions and limitations under the License.
+ *
+ */
+
 definition(
         name: "TPLink HS-110 (Connect)",
         namespace: "alexgrahamuk",
         author: "Alex Graham",
         description: "Allows you to connect your HS-110 energy monitored sockets using the alexgrahamuk hs-110-server.",
         category: "My Apps",
-        iconUrl: "https://s3.amazonaws.com/smartapp-icons/Partner/hue.png",
-        iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Partner/hue@2x.png",
+    	iconUrl: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience.png",
+    	iconX2Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
+		iconX3Url: "https://s3.amazonaws.com/smartapp-icons/Convenience/Cat-Convenience@2x.png",
         singleInstance: true
 )
 
@@ -32,31 +49,28 @@ def updated() {
 
 def initialize() {
 
-    subscribe(devices, "switch.on", "switchOnHandler")
-    subscribe(devices, "switch.off", "switchOffHandler")
-    subscribe(devices, "refresh.refresh", "switchRefreshHandler")
-    subscribe(gateway, "ping", "switchStatusHandler")
-
+    subscribe(devices, "switch.on", switchActionHandler)
+    subscribe(devices, "switch.off", switchActionHandler)
+    subscribe(devices, "refresh.refresh", switchActionHandler)
+    subscribe(gateway, "ping", switchStatusHandler)
 }
 
-def switchOnHandler(evt)
-{
-    log.debug("A switch turned on")
-    log.debug(evt.getDevice().deviceNetworkId)
-    gateway.poll()
-    gateway.executeCommand("on", evt.getDevice().currentValue('outletIP'), evt.getDevice().deviceNetworkId)
-}
+def switchActionHandler(evt) {
 
-def switchOffHandler(evt)
-{
-    log.debug("A switch turned off")
-    gateway.executeCommand("off", evt.getDevice().currentValue('outletIP'), evt.getDevice().deviceNetworkId)
-}
-
-def switchRefreshHandler(evt)
-{
-    log.debug("A switch was refreshed")
-    gateway.executeCommand("status", evt.getDevice().currentValue('outletIP'), evt.getDevice().deviceNetworkId)
+	def jsonSlurper = new groovy.json.JsonSlurper()
+	def eventData = jsonSlurper.parseText(evt.data)
+    
+	log.debug(evt)
+    log.debug(evt.data)
+   
+	def device = devices.find { eventData.deviceNetworkId == it.id }  
+    log.debug(device)
+    
+    return
+   
+    sendEvent(device, [name: "power", value: 777, isStateChange: true])
+    
+    gateway.executeCommand("refresh", eventData)
 }
 
 def switchStatusHandler(evt) {
